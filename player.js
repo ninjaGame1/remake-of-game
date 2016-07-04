@@ -7,8 +7,11 @@ var ANIM_WALK_LEFT = 2;
 var ANIM_IDLE_RIGHT = 3;
 var ANIM_JUMP_RIGHT = 4;
 var ANIM_WALK_RIGHT = 5;
+var ANIM_SHOOT_LEFT = 7;
+var ANIM_SHOOT_RIGHT = 8;
 var ANIM_MAX = 6;
 
+var bullets = [];
 var lives = 3;
 
 var Player = function() 
@@ -58,6 +61,7 @@ Player.prototype.update = function (deltaTime)
 	var left = false;
 	var right = false;
 	var jump = false;
+	var shoot = false;
 
 	// check keypress events
 	if(keyboard.isKeyDown(keyboard.KEY_LEFT) == true) 
@@ -103,6 +107,43 @@ Player.prototype.update = function (deltaTime)
 		{
 			this.sprite.setAnimation(ANIM_JUMP_RIGHT);
 		}
+	}
+	if(this.cooldownTimer > 0)
+	{
+		this.cooldownTimer -= deltaTime;
+	}
+	if(keyboard.isKeyDown(keyboard.KEY_SHIFT) == true && this.cooldownTimer <= 0) 
+	{
+		sfxFire.play();
+		this.cooldownTimer = 0.3;
+		// Shoot a bullet
+		var	tempBullet = new Bullet((this.position.x), this.position.y);
+		if(this.direction == LEFT)
+		{
+			left = true;
+			if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
+				this.sprite.setAnimation(ANIM_SHOOT_LEFT);
+		}
+		else
+		{
+			right = true;
+			if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
+				this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
+		}
+
+		if(right == true)
+		{
+			tempBullet.velocity.x = 400; //set direction for bullet
+			tempBullet.position.x += 80; //set position of bullet to make it come out of gun not belly
+		}
+		else
+		{
+			tempBullet.velocity.x = -400; //set direction for bullet
+			tempBullet.position.x -= 50; //set position of bullet to make it come out of gun not bell
+		}
+									
+		cooldownTimer = 0.5;			//set bullet timer to 0.5 seconds
+		bullets.push(tempBullet);		//add bullet to bullets array
 	}
 
 	var wasleft = this.velocity.x < 0;
