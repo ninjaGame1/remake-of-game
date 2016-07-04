@@ -36,6 +36,7 @@ var fps = 0;
 var fpsCount = 0;
 var fpsTime = 0;
 
+var respawn = 0;
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
@@ -54,13 +55,18 @@ var LAYER_PLATFORMS = 1;
 
 var LAYER_OBJECT_TRIGGERS = 3;
 var LAYER_OBJECT_COINS= 4;
+<<<<<<< HEAD
 var LAYER_OBJECT_ENEMIES = 5;
 
+=======
+var LAYER_OBJECT_CHECKPOINTS = 5;
+>>>>>>> origin/master
 var coins = [];
 var enemies = [];
 
 var ENEMY_MAXDX = METER * 5;
 var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+
 
 
 //size of map in tiles
@@ -234,7 +240,28 @@ function initialize()
 		}
 	}
 	//trigger layer in collision map - for the door to finish the game
-	cells[LAYER_OBJECT_TRIGGERS] = [];
+	cells[LAYER_OBJECT_CHECKPOINTS] = [];
+	idx = 0;
+	for(var y = 0; y < level1.layers[LAYER_OBJECT_CHECKPOINTS].height; y++)
+	{
+		cells[LAYER_OBJECT_CHECKPOINTS][y] = [];
+		for(var x = 0; x < level1.layers[LAYER_OBJECT_CHECKPOINTS].width; x++)
+		{
+			if(level1.layers[LAYER_OBJECT_CHECKPOINTS].data[idx] != 0)
+			{
+				cells[LAYER_OBJECT_CHECKPOINTS][y][x] = 1;
+				cells[LAYER_OBJECT_CHECKPOINTS][y-1][x] = 1;
+				cells[LAYER_OBJECT_CHECKPOINTS][y-1][x+1] = 1;
+				cells[LAYER_OBJECT_CHECKPOINTS][y][x+1] = 1;
+			}
+			else if(cells[LAYER_OBJECT_CHECKPOINTS][y][x] != 1)
+			{
+				cells[LAYER_OBJECT_CHECKPOINTS][y][x] = 0;
+			}
+			idx++;
+		}
+	}
+    cells[LAYER_OBJECT_TRIGGERS] = [];
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++)
 	{
@@ -255,6 +282,7 @@ function initialize()
 			idx++;
 		}
 	}
+<<<<<<< HEAD
 	//add enemies
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
@@ -282,6 +310,9 @@ function initialize()
             }
         }
     }
+=======
+    
+>>>>>>> origin/master
 	//add coins
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_COINS].height; y++)
@@ -495,6 +526,7 @@ function runGameWin(deltaTime, x, y)
 
 function run()
 {
+    
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	

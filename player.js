@@ -36,7 +36,18 @@ var Player = function()
 	}
 
 	this.position = new Vector2();
-	this.position.set( 1*35, 10*35);
+    console.log(respawn)
+	  if (respawn == 1)
+    {
+        this.position.set( 790, 175);
+    }
+    else{
+        this.position.set(35, 350);
+    }
+    
+        
+    
+  console.log("respawn =", respawn)
 
 	this.width = 159;
 	this.height = 163;
@@ -253,9 +264,15 @@ Player.prototype.update = function (deltaTime)
 	{
 		gameState = STATE_GAMEWIN;
 	}
+    if(cellAtTileCoord(LAYER_OBJECT_CHECKPOINTS, tx, ty)== true)
+	{
+		respawn = 1
+        console.log(respawn)
+	}
 };
 
 Player.prototype.draw = function() 
 {
 	this.sprite.draw(context, this.position.x - worldOffsetX,this.position.y);
+    
 }
