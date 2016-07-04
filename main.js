@@ -57,6 +57,7 @@ var LAYER_OBJECT_TRIGGERS = 4;
 var LAYER_OBJECT_COINS= 5;
 
 var coins = [];
+var bullets = [];
 
 
 
@@ -236,6 +237,34 @@ function initialize()
 			}
 		}
 	}
+
+	//add enemies
+	idx = 0;
+	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
+	{
+		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
+		{
+			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0)
+			{
+				var px = tileToPixel(x);
+				var py = tileToPixel(y);
+				var e = new Enemy(px, py);
+				enemies.push(e);
+			}
+			idx++;
+		}
+	}
+	
+	for( var i = 0; i < enemies.length; i++ )
+    {
+        for( var j = 0; j < enemies.length; j++)
+        {
+            if(enemies[i].position.x == enemies[j].position.x && enemies[i].position.y == enemies[j].position.y)
+            {
+            enemies.splice(i, 1)
+            }
+        }
+    }
 	//trigger layer in collision map - for the door to finish the game
 	cells[LAYER_OBJECT_TRIGGERS] = [];
 	idx = 0;
@@ -337,6 +366,10 @@ function runSplash(deltaTime)
 	context.fillStyle = "#000";
 	context.font="40px Arial";
 	context.fillText("Get Ready", 220, 240);
+
+	context.fillStyle = "#F20C0C";
+	context.font = "20px Arial";
+	context.fillText("press shift to shoot ", 290, 290);
 }
 
 function runGame(deltaTime)
@@ -361,10 +394,79 @@ function runGame(deltaTime)
 			}
 		}
 
+	//update bullets
+	var hit = false;
+	for(var i=0; i<bullets.length; i++)
+	{
+		bullets[i].update(deltaTime);
+		//check if the bullet went offscreen
+		//rememeber we are also scrolling the new world based on the player's
+		//position (so we need to find the bullet's screen coords)
+		if(bullets[i].position.x - worldOffsetX < 0 ||
+			bullets[i].position.x - worldOffsetX > SCREEN_WIDTH)
+		{
+			hit = true;
+		}
+		//also check if the bullet hit an enemy
+		for(var j=0; j<enemies.length; j++)
+		{
+			if(intersects(enemies[j].position.x, enemies[j].position.y, TILE, TILE,
+				bullets[i].position.x, bullets[i].position.y, TILE, TILE)== true)
+			{
+				//kill both bullet and enemy
+				enemies.splice(j, 1);
+				enemies.life -=1;
+				hit = true;
+				//increment score
+				score += 1;
+				break;
+			}
+		}
+		if(hit == true)
+		{
+			bullets.splice(i, 1);
+			break;
+		}
+	}
+	for(var j=0; j<enemies.length; j++)
+		{
+			if(player.isDead == false)
+			{
+				if(intersects(enemies[j].position.x, enemies[j].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+				{
+				//player.isDead == true;
+				lives -= 1;
+				player.position.set(1*35, 12*35);
+				break;
+				}
+			}
+		}
+		//increase coin count - up in 3
+		for(var i=0; i<coins.length; i++)
+		{
+			if(intersects(coins[i].position.x, coins[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+			{
+				score += 1; //increases by 3. dont know why and cant fix it :(
+				coins.splice(i, 1);
+				break;
+			}
+		}
+
 	//DRAW
 	drawMap();
 	player.draw();
 	
+	for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].draw(deltaTime);
+	}
+	
+	for(var i=0; i<bullets.length; i++)
+	{
+		bullets[i].draw(deltaTime);
+	}
 	for(var i=0; i<coins.length; i++)
 	{
 		coins[i].draw(deltaTime);
