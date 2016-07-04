@@ -36,7 +36,6 @@ var fps = 0;
 var fpsCount = 0;
 var fpsTime = 0;
 
-var respawn = 0;
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
@@ -49,23 +48,15 @@ var STATE_GAMEWIN = 3;
 var gameState = STATE_SPLASH;
 
 var LAYER_COUNT = 3;
-var LAYER_BACKGOUND = 0;
-var LAYER_PLATFORMS = 1;
+var LAYER_BACKGROUND = 0; 
+var LAYER_PLATFORMS = 1; 
+var LAYER_LADDERS = 2; 
+var LAYER_OBJECT_ENEMIES = 3; 
+var LAYER_OBJECT_TRIGGERS = 4; 
 
+var LAYER_OBJECT_COINS= 5;
 
-var LAYER_OBJECT_TRIGGERS = 3;
-var LAYER_OBJECT_COINS= 4;
-<<<<<<< HEAD
-var LAYER_OBJECT_ENEMIES = 5;
-
-=======
-var LAYER_OBJECT_CHECKPOINTS = 5;
->>>>>>> origin/master
 var coins = [];
-var enemies = [];
-
-var ENEMY_MAXDX = METER * 5;
-var ENEMY_ACCEL = ENEMY_MAXDX * 2;
 
 
 
@@ -88,7 +79,7 @@ var MAXDX = METER * 10;
 var MAXDY = METER * 15;
 var ACCEL = MAXDX * 2;
 var FRICTION = MAXDX * 6;
-var JUMP = METER * 1500;
+var JUMP = METER * 5000;
 
 //sound
 var musicBackground;
@@ -102,6 +93,12 @@ var keyboard = new keyboard();
 
 var score = 0;
 var lives = 3;
+
+//some enemy vars
+var ENEMY_MAXDX = METER * 5;
+var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+var enemies = [];
+
 
 //loading image
 var tileset = document.createElement("img");
@@ -240,28 +237,7 @@ function initialize()
 		}
 	}
 	//trigger layer in collision map - for the door to finish the game
-	cells[LAYER_OBJECT_CHECKPOINTS] = [];
-	idx = 0;
-	for(var y = 0; y < level1.layers[LAYER_OBJECT_CHECKPOINTS].height; y++)
-	{
-		cells[LAYER_OBJECT_CHECKPOINTS][y] = [];
-		for(var x = 0; x < level1.layers[LAYER_OBJECT_CHECKPOINTS].width; x++)
-		{
-			if(level1.layers[LAYER_OBJECT_CHECKPOINTS].data[idx] != 0)
-			{
-				cells[LAYER_OBJECT_CHECKPOINTS][y][x] = 1;
-				cells[LAYER_OBJECT_CHECKPOINTS][y-1][x] = 1;
-				cells[LAYER_OBJECT_CHECKPOINTS][y-1][x+1] = 1;
-				cells[LAYER_OBJECT_CHECKPOINTS][y][x+1] = 1;
-			}
-			else if(cells[LAYER_OBJECT_CHECKPOINTS][y][x] != 1)
-			{
-				cells[LAYER_OBJECT_CHECKPOINTS][y][x] = 0;
-			}
-			idx++;
-		}
-	}
-    cells[LAYER_OBJECT_TRIGGERS] = [];
+	cells[LAYER_OBJECT_TRIGGERS] = [];
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++)
 	{
@@ -282,37 +258,6 @@ function initialize()
 			idx++;
 		}
 	}
-<<<<<<< HEAD
-	//add enemies
-	idx = 0;
-	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
-	{
-		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
-		{
-			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0)
-			{
-				var px = tileToPixel(x);
-				var py = tileToPixel(y);
-				var e = new Enemy(px, py);
-				enemies.push(e);
-			}
-			idx++;
-		}
-	}
-	
-	for( var i = 0; i < enemies.length; i++ )
-    {
-        for( var j = 0; j < enemies.length; j++)
-        {
-            if(enemies[i].position.x == enemies[j].position.x && enemies[i].position.y == enemies[j].position.y)
-            {
-            enemies.splice(i, 1)
-            }
-        }
-    }
-=======
-    
->>>>>>> origin/master
 	//add coins
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_COINS].height; y++)
@@ -416,35 +361,6 @@ function runGame(deltaTime)
 			}
 		}
 
-	var hit=false;
-	for(var i=0; i<bullets.length; i++)
-	{
-		bullets[i].update(deltaTime);
-		if( bullets[i].position.x - worldOffsetX < 0 ||
-			bullets[i].position.x - worldOffsetX > SCREEN_WIDTH)
-		{
-			hit = true;
-		}
-
-		for(var j=0; j<enemies.length; j++)
-		{
-			if(intersects( bullets[i].position.x, bullets[i].position.y, TILE, TILE,
-				enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
-			{
-				// kill both the bullet and the enemy
-				enemies.splice(j, 1);
-				hit = true;
-				// increment the player score
-				score += 1;
-				break;
-			}
-		}
-		if(hit == true)
-		{
-			bullets.splice(i, 1);
-			break;
-		}
-	}
 	//DRAW
 	drawMap();
 	player.draw();
@@ -463,7 +379,7 @@ function runGame(deltaTime)
 		{
 				player.isDead == true;
 				lives -= 1;
-				player.position.set(1*35, 10*35);
+				player.position.set(1*50, 10*35);
 		}
 		if(lives == 0)
 		{
@@ -526,7 +442,6 @@ function runGameWin(deltaTime, x, y)
 
 function run()
 {
-    
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
